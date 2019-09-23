@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h> // malloc
 #define true 1
 #define flase 0
 typedef char ElemType;
@@ -7,8 +8,9 @@ typedef struct{
     int last;
 }List;
 
-List* Initial_List(List* L)
+List* Initial_List()
 {
+  List *L = (List*)malloc(sizeof(List)); // 之前没有申请空间
   L->last = -1;
   return L;
 }
@@ -16,18 +18,22 @@ List* Initial_List(List* L)
 List* Create_number(List* L)
 {
   ElemType c;
-  int i;
-  c=getchar();
-  while(c != -1)
+  int i = 0; // 别忘了初始化
+  // c = getchar();
+  while((c=getchar()) != '$')
   {
     if(L->last != 19 )
     {
-      L->elem[i++];
+      L->elem[i++] = c;  // 没有赋值
       L->last++;
-      c=getchar();
+      // c=getchar();
     }
     else
-    {printf("此表已满！\n");return;}
+    {
+      printf("1此表已满！\n");
+      return NULL; // 注意, return; 是在void的时候才能这样用,不然怎么样都有返回值
+    }
+
   }
   return L;
 }
@@ -52,7 +58,7 @@ void Print(List* L)
 {
   int i;
   for (i = 0; i<= L->last; i++)
-    printf("%d ",L->elem[i]);
+    printf("%c ",L->elem[i]); // 字符型会输出ASKii码
 
 }
 void Searchbynumber(List *L,int n)
@@ -87,8 +93,9 @@ void Delete(List *L,int n)
 
 int main() {
   List *L1;
-  L1 = Initial_List(L1);
+  L1 = Initial_List();
   L1 = Create_number(L1);
+  printf("%d\n", L1->last);
   Print(L1);
   return 0;
 }
