@@ -273,9 +273,33 @@ void BubbleSort(List *L)
 int main() {
   List *L1;
   L1 = InitialList();
+
+  printf("请为顺序表输入取值\n");
   Createnumber(L1);
+  printf("显示出该顺序表\n");
   Print(L1);
-  printf("\n" );
+
+  printf("请输入你想查找的顺序表中的元素的位置\n");
+  int i;
+  scanf("%d\n",&i );
+  SearchbyPosition(L1,i);
+  i=0;
+
+  printf("请输入你想查找的顺序表中的元素的值\n");
+  char c;
+  scanf("%c\n", &c);
+  SearchbyValue(L1, c);
+  c=0;
+
+  printf("请输入你想要删除元素的位置\n");
+  scanf("%d\n",&i );
+  Delete(L1,i);
+  i=0;
+
+  printf("请输入你想要插入元素的位置和取值，请按顺序输入\n");
+  scanf("%d %c\n", &i,&e);
+  Insert(L1,i,e);
+
   BubbleSort(L1);
   Print(L1);
 

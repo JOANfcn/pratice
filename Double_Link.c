@@ -18,21 +18,22 @@ LinkList Initial()
   return *L;
 }
 
-void CreatTail(LinkList *dlK)
+void CreatTail(LinkList *dlK) //  尾插法进行建表
 {
   char c;
   while((c!=getchar())!='$')
   {
     LinkList *L;   // 先定义变量再申请空间，否则 无变量承受所申请的空间
+                  //为什么定义变量
     L = malloc(sizeof(LinkList));   //  申请空间时sizeof中的名字必须时结构题的下边定义的名字
-    L = dlK->Next;
+     dlK->Next=L ;
     L->prior = dlK;
     L->e = c;
-    L->Next = NULL;
+    L->Next = NULL; //  自定义取值为NULL？
   }
 }
 
-void Delete(LinkList *p)
+void Delete(LinkList *p)  //  记录头节点(干啥用的)
 {
   LinkList *q,*h;
 
@@ -45,7 +46,32 @@ void Delete(LinkList *p)
   free(p);
 }
 
-void DeletePrior(LinkList *p)
+void DeleteNext(LinkList *p)
 {
   LinkList *q;
+  char c;//保存删除的元素
+  q = p->next;
+
+  LinkList *qn; //  没定义，先保存然后再断开连接q->next代替
+
+  qn = q->next;
+  p->next = qn;
+  qn->prior = p;
+
+  free(q);
+}
+
+void Insert(LinkList *p,char c)
+{
+  LinkList *s,*q;
+
+  s = malloc(sizeof(LinkList));
+
+  s->e = c;
+  s = p->next;
+  p->next = s;
+  s->prior = p;
+  s->next = q;
+  q->prior = s;
+
 }
