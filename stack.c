@@ -1,14 +1,13 @@
-//栈的基本操作
-#include"stdio.h"
-#include "stdlib.h"
+
+#include <stdio.h>
+#include <stdlib.h>
 #define StackSize 20
 #define Increasement 10
-
-
 typedef struct                         //定义迷宫中的元素的位置
 {
   int row;
   int col;
+  int dir;
 }element;
 
 typedef element ElemType;
@@ -18,53 +17,53 @@ typedef struct                          //定义顺序栈额结构体
   ElemType *base;                       //指向栈底
   ElemType *top;                        //指向栈顶
   int size;                             //表示栈的容量
-}SeqStack;
+}SeqStack,*qSeqStack;
 
-
-SeqStack *Initial();                    // 初始化一个栈
-int StackLen(SeqStack *s);              // 当前栈的长度
-void Push(SeqStack *s,ElemType e);      //压栈操作
-void Pop(SeqStack *s);                  //出栈操作
-void DestoryStack(SeqStack *s);         //摧毁栈
-ElemType Get(SeqStack *s);              //取出栈顶的值
-void JudgeDirection(SeqStack *s,int *a[9][9]);        //判断方向函数
-void FirstCirculation(SeqStack *s,int *a[][9],int i,int j,int *flag);  //第一次循环
-void SecondCirculation(SeqStack *s,int *a[][9],int i,int j);           //第二次循环
+//函数说明
+qSeqStack InitStack();                    // 初始化一个栈
+int StackLen(qSeqStack s);              // 当前栈的长度
+void Push(qSeqStack s,ElemType e);      //压栈操作
+void Pop(qSeqStack s,ElemType *e);      //出栈操作
+int IsStackEmpty(qSeqStack s);          //判断此栈是否为空
+void ClearStack(qSeqStack s);
+void DestoryStack(qSeqStack s);         //摧毁栈
+ElemType GetTop(qSeqStack s);              //取出栈顶的值
+void JudgeDirection(qSeqStack s,int *a[9][9]);        //判断方向函数
+void FirstCirculation(qSeqStack s,int *a[][9],int i,int j,int *flag);  //第一次循环
+void SecondCirculation(qSeqStack s,int *a[][9],int i,int j);           //第二次循环
 void PrintfMap(int *a[][9]);                               //打印迷宫
-void PrintfStack(SeqStack *s);                            //打印顺序栈
+void PrintfStack(qSeqStack s);                            //打印顺序栈
 
-SeqStack *Initial()
+qSeqStack InitStack()
 {
-  SeqStack *s;
-  s->base = malloc( StackSize * sizeof(ElemType) );
+  qSeqStack s;
+  s = malloc(sizeof(SeqStack));
+  if (!s)
+    return NULL;
 
+  s->base = malloc( StackSize * sizeof(ElemType) );
   if(!s->base)                         //判断是否申请失败
-  {
-    printf("Fail\n");
     exit(0);
-  }
 
   s->top = s->base;                  //表示空栈
   s->size = StackSize;               //给StackSize赋值为当前栈的容量
   return s;                          //返回所创建的栈的地址
 }
 
-int StackLen(SeqStack *s)
+int StackLen(qSeqStack s)
 {
   return(s->top-s->base);           //求栈的当前的容量
 }
 
-void Push(SeqStack *s,ElemType e)
+void Push(qSeqStack s,ElemType e)
 {
   if(s->top-s->base>=s->size)
   {
     s->base =( ElemType * )  realloc( s->base,(StackSize+Increasement) * sizeof( ElemType ) );
 
     if(!s->base)               //判断是否成功申请空间
-    {
-      printf("Fail\n");
       exit(0);
-    }
+
     s->top = s->base + s->size;   //设置栈顶
     s->size = s->size + Increasement; // 重新设置栈的容量
   }
@@ -73,7 +72,7 @@ void Push(SeqStack *s,ElemType e)
   s->top++;                       //栈顶推进
 }
 
-void Pop(SeqStack *s)
+void Pop(qSeqStack s,ElemType *e)
 {
   if( s->base == s->top )       //判断此栈是否为空
   {
@@ -81,10 +80,31 @@ void Pop(SeqStack *s)
     return ;
   }
 
-  s->top--;           //将删除的元素传递出，先将s->top--之后再将值赋值给e
+  *e = *(--s->top);
 }
 
-void DestoryStack(SeqStack *s)
+int IsStackEmpty(qSeqStack s)
+{
+  if(s->top == s->base)
+  return 1;
+  else
+  return 0;                           //两种结果
+}
+
+void ClearStack(qSeqStack s)
+{
+  if(s->top == s->base)
+  {
+    printf("empty！\n");
+    exit(0);
+  }
+  while(s->top!=s->base)
+  {
+    Pop(s,NULL);
+  }
+}
+
+void DestoryStack(qSeqStack s)
 {
   int i,len;
   len = s->size;
@@ -99,7 +119,7 @@ void DestoryStack(SeqStack *s)
   s->size = 0;                    //长度为0
 }
 
-ElemType Get(SeqStack *s)
+ElemType GetTop(qSeqStack s)
 {
   if ( s->base == s->top )
   {
@@ -107,18 +127,18 @@ ElemType Get(SeqStack *s)
     exit(0);
   }
 
-  return *(s->top--);
+  return *(--s->top); // 先让top-1然后得到栈顶值
 }
 
-void JudgeDirection(SeqStack *s,int *a[][9])
+void JudgeDirection(qSeqStack s,int *a[][9])
 {
   int M,N;
   M = 7;
   N = 6;
 
   int i,j;
-  i = 0;
-  j = 0;
+  i = 1;
+  j = 1;
 
   int f;
 
@@ -133,7 +153,7 @@ void JudgeDirection(SeqStack *s,int *a[][9])
   }
 }
 
-void FirstCirculation(SeqStack *s,int *a[][9],int i,int j,int *flag)
+/*void FirstCirculation(qSeqStack s,int *a[][9],int i,int j,int *flag)
 {
   element elem;
 
@@ -187,7 +207,7 @@ void FirstCirculation(SeqStack *s,int *a[][9],int i,int j,int *flag)
     }
 }
 
-void SecondCirculation(SeqStack *s,int *a[][9],int i,int j)
+void SecondCirculation(qSeqStack s,int *a[][9],int i,int j)
 {
   element elem;
 
@@ -228,7 +248,7 @@ void PrintfMap(int *a[][9])
   }
 }
 
-void PrintfStack(SeqStack *s)
+void PrintfStack(qSeqStack s)
 {
   int i,len;
   len = s->top-s->base;
@@ -242,8 +262,8 @@ void PrintfStack(SeqStack *s)
 
 int main()
 {
-  SeqStack *s;
-  s = Initial();
+  SeqStack *s1;
+  s1 = Initial();
 
   int a[9][9]=
   {
@@ -259,6 +279,7 @@ int main()
   };
 
 
-  JudgeDirection(s,a);
-  PrintfStack(s);
-}
+  JudgeDirection(s1,a);
+
+  PrintfMap(a);
+}*/
