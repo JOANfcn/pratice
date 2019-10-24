@@ -18,7 +18,7 @@ direction orient[4] =
   {-1,0}     //下
 };
 
-int a[9][9]=
+int maze[9][9]=
   {
     1,1,1,1,1,1,1,1,1,
     1,0,1,1,1,1,1,1,1,
@@ -70,8 +70,9 @@ void MazePath()
       e.dir = 0;
       Push(s,e);
     }
-    else if(a[next_row] == 0 && a[next_col] == 0)
+    else if(maze[next_row] == 0 && maze[next_col] == 0)
     {
+      maze[next_row][next_col]=1;
       e.row = row;          // 把当前元素压到栈中
       e.col = col;
       e.dir = dir;
